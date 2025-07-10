@@ -81,7 +81,7 @@ export const setupGuards = router => {
       // Obtener el rol del usuario
       const role = getUserRole();
       // console.log('role', role);
-      // console.log('USER', USER);
+      console.log('USER', USER);
 
       // Definir la ruta de dashboard según el rol
       let dashboardRoute = 'dashboard'; // Ruta por defecto

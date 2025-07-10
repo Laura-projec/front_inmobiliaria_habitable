@@ -125,7 +125,7 @@ const deleteItem = (item) => {
 
 definePage({
     meta: {
-        permissions: 'list_cliente'
+        permissions: 'cliente'
     },
 })
 </script>

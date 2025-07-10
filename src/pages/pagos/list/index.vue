@@ -33,8 +33,8 @@ const getPagos = async () => {
 
     try {
         let endpoint = '/pagos'
-        if (userRole.value !== 'Administrador' && userRole.value !== 'Super Admin') {
-            endpoint = `/pagos?user_id=${userId.value}`
+        if (userRole.value !== 'Administrador' && userRole.value !== 'super-admin') {
+            endpoint = `/pagos?inmueble_id=${userInmuebleId.value}`
         }
         const resp = await $api(endpoint, { method: 'GET' })
         console.log(`Pagos obtenidos:`, resp);
@@ -70,7 +70,12 @@ const headers = [
                     <VTextField v-model="searchQuery" placeholder="Buscar por descripción" style="inline-size: 200px"
                         density="compact" class="me-3" @keyup.enter="getPagos" />
 
-                    <VBtn color="primary" prepend-icon="ri-add-line" :to="{ name: 'pago-nuevo' }">
+                    <VBtn
+                        v-if="user.value?.permisos?.includes('pago_nuevo')"
+                        color="primary"
+                        prepend-icon="ri-add-line"
+                        :to="{ name: 'pago-nuevo' }"
+                    >
                         Nuevo Pago
                     </VBtn>
                 </div>

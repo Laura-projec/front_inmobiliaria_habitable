@@ -66,6 +66,19 @@ const getInmueblesByCliente = async (clienteId) => {
 // 👁️ Observar cambio de propietario
 watch(() => dano.value.propietario, getInmueblesByCliente)
 
+const getInmuebleById = async (inmuebleId) => {
+  if (!inmuebleId) return
+  try {
+    const resp = await $api(`/inmuebles/${inmuebleId}`, { method: 'GET' })
+    // Si el inmueble no está en la lista, lo agregamos
+    if (resp && resp.id && !properties.value.some(p => p.id === resp.id)) {
+      properties.value.push(resp)
+    }
+  } catch (error) {
+    console.error('Error al obtener inmueble por ID:', error)
+  }
+}
+
 const getDano = async () => {
   isLoading.value = true
   try {
@@ -79,10 +92,13 @@ const getDano = async () => {
     fotoAntesUrl.value = resp.before_damage_photo_url || null
     fotoDespuesUrl.value = resp.after_damage_photo_url || null
 
-    // Si eres superadmin, busca el propietario y setea el select
-    if (userRole.value === 'super-admin' && resp.propietario_id) {
+    // Si eres superadmin o administrador, busca el propietario y setea el select
+    if ((userRole.value === 'super-admin' || userRole.value === 'administrador') && resp.propietario_id) {
       dano.value.propietario = resp.propietario_id
       await getInmueblesByCliente(resp.propietario_id)
+    } else if (resp.inmueble_id) {
+      // Si no es superadmin, asegurarse de que el inmueble esté en la lista
+      await getInmuebleById(resp.inmueble_id)
     }
   } catch (error) {
     console.error('Error al obtener el daño:', error)
@@ -151,11 +167,11 @@ const guardarCambios = async () => {
 }
 
 onMounted(async () => {
-  if (userRole.value === 'super-admin') {
+  if (userRole.value === 'super-admin' || userRole.value === 'Administrador') {
     await getClientes()
   }
   await getDano()
-  if (userRole.value !== 'super-admin') {
+  if (userRole.value !== 'super-admin' && userRole.value !== 'Administrador') {
     dano.value.idinmueble = userInmuebleId.value
   }
 })
@@ -183,6 +199,15 @@ onMounted(async () => {
         {{ successMessage }}
       </VAlert>
 
+      <!-- Dirección del inmueble como título -->
+      <h4 v-if="dano.idinmueble" class="mb-4">
+        Inmueble:
+        {{
+          (properties.find(p => p.id == dano.idinmueble) && properties.find(p => p.id == dano.idinmueble).direccion)
+          || 'Sin dirección'
+        }}
+      </h4>
+
       <VForm @submit.prevent="guardarCambios">
         <VRow dense>
           <!-- Solo para super-admin -->
@@ -200,7 +225,7 @@ onMounted(async () => {
             </VCol>
           </template>
 
-          <VCol cols="12" md="6" v-if="userRole !== 'super-admin'">
+          <VCol cols="12" md="6" v-if="userRole !== 'super-admin' && userRole !== 'Administrador'">
             <VTextField v-model="dano.idinmueble" label="ID del Inmueble" class="mb-4" readonly outlined />
           </VCol>
 

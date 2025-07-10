@@ -70,7 +70,7 @@ const isEditing = ref(false)
 const dialogConfirmar = ref(false)
 const finalizando = ref(false)
 const contratoId = ref(/* tu id aquí o pásalo como prop */)
-
+const isLoading = ref(false)
 
 const guardarInmueble = async () => {
    if (!direccion.value || !selectedPropietario.value || !actividad.value || !precio.value || !matricula.value) {
@@ -83,6 +83,7 @@ const guardarInmueble = async () => {
       return;
    }
 
+   isLoading.value = true;
    // Crear un FormData para enviar los datos
    const formData = new FormData();
 
@@ -162,6 +163,8 @@ const guardarInmueble = async () => {
    } catch (error) {
       warning.value = "Error al guardar el inmueble";
       console.error("Error al guardar el inmueble:", error);
+   } finally {
+      isLoading.value = false;
    }
 };
 
@@ -331,8 +334,8 @@ const loadInmueble = async (id) => {
       porcentajeArriendo.value = resp.porcentaje_arriendo;
       valorSeguro.value = resp.valor_seguro;
       requiereAdministracion.value = resp.pago_administracion
-      medioPagoFecha.value = resp.fecha_pago_propietario	;
-      
+      medioPagoFecha.value = resp.fecha_pago_propietario;
+
 
       // Características del inmueble
       opciones.value = resp.caracteristicas.map((caracteristica) => ({
@@ -457,7 +460,7 @@ onMounted(async () => {
             <VBtn variant="outlined" color="secondary" @click="router.push('/inmuebles')">
                Cancelar
             </VBtn>
-            <VBtn variant="outlined" color="primary" @click="guardarInmueble">
+            <VBtn variant="outlined" color="primary" @click="guardarInmueble" :loading="isLoading">
                {{ isEditing ? 'Actualizar' : 'Guardar' }}
             </VBtn>
          </div>
@@ -625,28 +628,30 @@ onMounted(async () => {
                         <template v-if="inStock === true || inStock === 'true'">
                            <VCol cols="12">
                               <VCol>
-                                 <VTextField v-model="referenciaPersonal1" label="Referencia personal" />
-                              </VCol>
-                              <VCol>
-                                 <VTextField v-model="celularReferencia1" type="number" label="Celular referencia 1"
-                                    placeholder="311312****" />
-                              </VCol>
-                              <VCol>
-                                 <VTextField v-model="referenciaPersonal2" label="Referencia personal 2" />
-                              </VCol>
-                              <VCol>
-                                 <VTextField v-model="celularReferencia2" type="number" label="Celular referencia 2"
-                                    placeholder="311312****" />
-                              </VCol>
-                              <VCol>
                                  <VSelect v-model="titular" :items="inquilinosList" item-title="fullName"
                                     item-value="id" label="Titular (Inquilino)" placeholder="Seleccione el titular"
                                     class="mb-2" />
                               </VCol>
                               <VCol>
-                                 <VTextField v-model="coodeudor" label="Coodeudor" placeholder="Ingrese el coodeudor"
+                                 <VTextField v-model="coodeudor" label="Nombre Coodeudor" placeholder="Ingrese el coodeudor"
                                     type="text" class="mb-6" />
                               </VCol>
+                              <VCol>
+                                 <VTextField v-model="referenciaPersonal1" label="Correo Coodeudor" />
+                              </VCol>
+                              <VCol>
+                                 <VTextField v-model="celularReferencia1" type="number" label="Celular Coodeudor"
+                                    placeholder="311312****" />
+                              </VCol>
+                              <VCol>
+                                 <VTextField v-model="referenciaPersonal2" label="Referencia personal" />
+                              </VCol>
+                              <VCol>
+                                 <VTextField v-model="celularReferencia2" type="number" label="Celular referencia"
+                                    placeholder="311312****" />
+                              </VCol>
+
+                              
                            </VCol>
                            <template v-if="mostrarPorcentajeSeguro">
                               <VDivider class="my-2" />

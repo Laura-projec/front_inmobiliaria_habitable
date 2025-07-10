@@ -50,16 +50,6 @@ const getClientes = async () => {
 };
 
 
-// 📡 Obtener clientes activos
-// const getClientes = async () => {
-//   try {
-//     const resp = await $api('/activos', { method: 'GET' })
-//     clients.value = resp.clients || []
-//   } catch (error) {
-//     console.error('Error al obtener clientes:', error)
-//   }
-// }
-
 // 🏘️ Obtener inmuebles del cliente
 const getInmueblesByCliente = async (clienteId) => {
   if (!clienteId) return
@@ -146,7 +136,7 @@ const crearDano = async () => {
 }
 
 onMounted(() => {
-  if (userRole.value === 'super-admin') {
+  if (userRole.value === 'super-admin' || userRole.value === 'Administrador') {
     getClientes()
   } else {
     // Si no es superadmin, setear el inmueble automáticamente
@@ -180,7 +170,7 @@ onMounted(() => {
       <VForm @submit.prevent="crearDano">
         <VRow dense>
           <!-- Solo para super-admin -->
-          <template v-if="userRole === 'super-admin'">
+          <template v-if="userRole === 'super-admin'  || userRole === 'Administrador'">
             <VCol cols="12" md="6">
               <VTextField v-model="search" label="Buscar cliente" class="mb-4" clearable outlined />
             </VCol>
@@ -194,7 +184,7 @@ onMounted(() => {
             </VCol>
           </template>
 
-          <VCol cols="12" md="6" v-if="userRole !== 'super-admin'">
+          <VCol cols="12" md="6" v-if="userRole !== 'super-admin' && userRole !== 'Administrador'">
             <VTextField v-model="dano.idinmueble" label="ID del Inmueble" class="mb-4" readonly outlined />
           </VCol>
 

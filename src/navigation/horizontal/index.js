@@ -21,7 +21,7 @@ export default [
   {
     title: 'Clientes',
     to: { name: 'clientes' },
-    permissions: 'list_cliente',
+    permissions: 'cliente',
     icon: { icon: 'ri-group-line' },
   },
   { heading: 'Gestion de Inmuebles' },

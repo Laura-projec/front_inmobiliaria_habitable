@@ -1,8 +1,21 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { VCardText } from 'vuetify/components'
+import { ref, onMounted, computed } from 'vue'
+import { VCardText } from 'vuetify/components' 
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/views/js/useAuthStore'
+import { useUserStore } from '@/views/js/userStore'
 
 const router = useRouter()
+const authStore = useAuthStore()
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
+console.log('user inicial', user.value);
+
+const userRole = computed(() => user.value?.role?.name?.toLowerCase() || '')
+const userId = computed(() => user.value?.idUser)
+const userInmuebleId = computed(() => user.value?.inmueble_id)
+
+const canCreateRecibo = computed(() => (authStore.permissions || []).includes('create_recibos'))
 const searchQuery = ref(null)
 const isListUserVisible = ref(true)
 const recibos = ref([])
@@ -16,9 +29,21 @@ const headers = [
   { title: 'Acciones', key: 'actions' },
 ]
 
-// 🚀 Traer los recibos
+// 🚀 Traer los recibos según el rol
 const fetchRecibos = async () => {
-  const resp = await $api('/recibos-list?search=' + (searchQuery.value ? searchQuery.value : ''), { method: 'GET' })
+  let endpoint = '/recibos-list?'
+  if (searchQuery.value) endpoint += `search=${searchQuery.value}&`
+
+  if (userRole.value === 'super-admin' || userRole.value === 'administrador') {
+    // No agregar filtros, mostrar todo
+    console.log('user final', userRole.value, userId.value);
+    
+  } else if (userRole.value === 'propietario') {
+    endpoint += `propietario_id=${userId.value}&`
+  } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
+    endpoint += `inquilino_id=${userId.value}&`
+  }
+  const resp = await $api(endpoint, { method: 'GET' })
   recibos.value = resp.recibos
 }
 
@@ -28,14 +53,8 @@ onMounted(fetchRecibos)
 const invoicePreviewRef = ref(null)
 
 const printInvoice = (id) => {
-  // Navegar a la página de recibo con el ID correspondiente
-
-  // router.push({ name: 'ver-recibo', params: { id }, query: { imprimir: 'true' } })
   router.push({ name: 'recibo-print', params: { id }, query: { imprimir: 'true' } })
-  // Aquí asumimos que el componente InvoicePreview está en esa página,
-  // y después se imprime automáticamente cuando el recibo se cargue
   setTimeout(() => {
-    // Aquí puedes llamar al método de impresión del componente hijo si es necesario
     const section = invoicePreviewRef.value?.printSection
     if (!section) return alert('No se encontró la sección de impresión')
     const originalContent = document.body.innerHTML
@@ -43,7 +62,7 @@ const printInvoice = (id) => {
     document.body.innerHTML = printContent
     window.print()
     document.body.innerHTML = originalContent
-  }, 1000) // Esperar un poco para que la vista se cargue
+  }, 1000)
 }
 
 // Configuración de la página (sin cambios)
@@ -62,7 +81,7 @@ definePage({
           @keyup.enter="fetchRecibos" />
       </div>
 
-      <VBtn prepend-icon="ri-add-line" :to="{ name: 'agregar-recibos' }">
+      <VBtn v-if="canCreateRecibo" prepend-icon="ri-add-line" :to="{ name: 'agregar-recibos' }">
         Crear Recibo
       </VBtn>
 

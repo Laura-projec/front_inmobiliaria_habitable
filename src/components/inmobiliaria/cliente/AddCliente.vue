@@ -126,7 +126,7 @@ const save = async () => {
   formData.append("celular", clientData.value.celular)
   formData.append("email", clientData.value.email)
   formData.append("password", clientData.value.password)
-  formData.append("status", clientData.value.status)
+  formData.append("status", clientData.value.status.charAt(0))
   formData.append("genero", clientData.value.genero)
   formData.append("role_id", clientData.value.role_id)
   if (FILE_AVATAR) {

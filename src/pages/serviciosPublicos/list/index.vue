@@ -8,7 +8,8 @@ const serviciosPublicos = ref([])
 
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
-const userRole = computed(() => user.value?.role?.name || '')
+const userRole = computed(() => user.value?.role?.name?.toLowerCase() || '')
+const userId = computed(() => user.value?.id)
 const userInmuebleId = computed(() => user.value?.inmueble_id || null)
 
 // Agrupar por inmueble_id
@@ -29,10 +30,13 @@ const getServiciosPublicos = async () => {
   warning.value = null
 
   try {
-    const endpoint =
-      userRole.value === 'super-admin'
-        ? '/public-services'
-        : `/public-services?inmueble_id=${userInmuebleId.value}`
+    let endpoint = '/public-services'
+    if (userRole.value === 'propietario') {
+      endpoint = `/public-services?propietario_id=${userId.value}`
+    } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
+      endpoint = `/public-services?inmueble_id=${userInmuebleId.value}`
+    }
+    // Si es super-admin o administrador, endpoint queda igual
 
     const resp = await $api(endpoint, { method: 'GET' })
     serviciosPublicos.value = resp || []
@@ -47,8 +51,6 @@ const getServiciosPublicos = async () => {
 onMounted(getServiciosPublicos)
 
 const noServicios = computed(() => !isLoading.value && serviciosPublicos.value.length === 0)
-
-
 
 const currentPage = ref(1)
 const itemsPerPage = ref(6)

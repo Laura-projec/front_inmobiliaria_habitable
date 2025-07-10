@@ -1,6 +1,8 @@
 <script setup>
 import EcommerceSalesOverview from '@/views/pages/dashboardAdmin/EcommerceSalesOverview.vue'
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
 
 definePage({
   meta: {
@@ -15,6 +17,7 @@ const reciboSeleccionado = ref(null)
 const showReciboModal = ref(false)
 const aprobando = ref(false)
 const aprobacionMsg = ref(null)
+const router = useRouter()
 
 const getRecibosPendientes = async () => {
   isLoadingRecibos.value = true
@@ -42,6 +45,10 @@ const aprobarRecibo = async () => {
     aprobacionMsg.value = 'Recibo aprobado correctamente.'
     await getRecibosPendientes()
     showReciboModal.value = false
+    setTimeout(() => {
+      router.push("/AgregarRecibos");
+      aprobacionMsg.value = null
+    }, 3000)
   } catch (e) {
     aprobacionMsg.value = 'No se pudo aprobar el recibo.'
   } finally {

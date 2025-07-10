@@ -5,6 +5,7 @@ import { $api } from '@/utils/api'
 
 const router = useRouter()
 const items = ref([])
+const isLoading = ref(false)
 
 const form = ref({
   user_id: '',
@@ -152,6 +153,7 @@ watch(
 )
 
 const enviarFormulario = async () => {
+  isLoading.value = true
   try {
     const payload = {
       user_id: form.value.user_id,
@@ -171,6 +173,8 @@ const enviarFormulario = async () => {
     router.push('/historyInmueble')
   } catch (error) {
     console.error('Error al crear la novedad:', error)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -182,7 +186,7 @@ const enviarFormulario = async () => {
         <h2 class="text-h5 font-weight-bold mb-0">Agregar Novedad</h2>
         <div>
           <VBtn color="secondary" variant="outlined" @click="router.push('/novedades')" class="me-2">Cancelar</VBtn>
-          <VBtn color="primary" type="submit" form="novedadForm">Guardar</VBtn>
+          <VBtn color="primary" type="submit" form="novedadForm" :loading="isLoading">Guardar</VBtn>
         </div>
       </div>
 

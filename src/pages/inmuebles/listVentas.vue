@@ -18,6 +18,7 @@ const defaultItem = ref({
 const headers = [
     { title: 'Id', key: 'id' },
     { title: 'Propietario', key: 'userFullName' },
+    { title: 'Inmueble', key: 'direccion' },
     { title: 'Matrícula', key: 'matricula' },
     { title: 'Estado', key: 'estado' },
     { title: 'En Stock', key: 'stock' },

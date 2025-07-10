@@ -56,25 +56,21 @@ const timelineData = ref([])
 const modalData = ref(null)
 const showModal = ref(false)
 
-// Obtener inmuebles del usuario
+// Obtener inmuebles del usuario según el rol
 const getInmuebles = async () => {
    try {
       let endpoint = '/inmuebles'
-      if (isOwner.value) {
-         endpoint = `/inmuebles?user_id=${user.value.idUser}`
-      } else if (isTenant.value) {
-         endpoint = `/inmuebles`
+      if (userRole.value === 'propietario') {
+         endpoint = `/inmuebles?user_id=${userId.value}`
+      } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
+         endpoint = `/inmuebles?inquilino_id=${userId.value}`
       }
-      // const endpoint =
-      //    isOwner.value
-      //       ? `/inmuebles?user_id=${user.value.idUser}`
-      //       : `/inmuebles?tenant_id=${user.value.idUser}`
-
+      // Si es admin o super-admin, endpoint queda igual
       const resp = await $api(endpoint, { method: 'GET' })
       inmuebles.value = resp.inmuebles || []
       inmuebleSeleccionado.value = inmuebles.value[0] || null
       if (inmuebleSeleccionado.value) {
-         if (isOwner.value) {
+         if (userRole.value === 'propietario') {
             await getPropietario(inmuebleSeleccionado.value.users_id)
             await getInquilino(inmuebleSeleccionado.value.id)
          }
@@ -120,21 +116,26 @@ const getCaracteristicas = async (inmuebleId) => {
    }
 }
 
+const userRole = computed(() => user.value?.role?.name?.toLowerCase() || '')
+const userId = computed(() => user.value?.idUser || user.value?.id)
 
-// Obtener datos de la línea de tiempo
+// Obtener datos de la línea de tiempo según el rol
 const getTimelineData = async (tab) => {
    try {
-      // Verificar si inmuebleSeleccionado es un objeto o solo un id
       let inmuebleId = inmuebleSeleccionado.value?.id || inmuebleSeleccionado.value;
-
-      // Si es necesario, buscar el objeto completo en la lista de inmuebles
       if (!inmuebleId) {
          console.error('No se pudo determinar el ID del inmueble seleccionado.');
          return;
       }
-
-      const resp = await $api(`/${inmuebleId}/${tab}`, { method: 'GET' });
-
+      let endpoint = `/${inmuebleId}/${tab}`
+      // Si es propietario, filtra por user_id
+      if (userRole.value === 'propietario') {
+         endpoint += `?user_id=${userId.value}`
+      } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
+         endpoint += `?inquilino_id=${userId.value}`
+      }
+      // Si es admin o super-admin, endpoint queda igual
+      const resp = await $api(endpoint, { method: 'GET' });
       timelineData.value = (resp || []).map((item) => ({
          id: item.id,
          titulo: item.titulo,
@@ -225,12 +226,12 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
                   <p><strong>Email:</strong> {{ propietario?.email }}</p>
                   <p><strong>Teléfono:</strong> {{ propietario?.celular }}</p>
 
-                  <div v-if="inquilino" class="mt-4">
+                  <!-- <div v-if="inquilino" class="mt-4">
                      <h4 class="text-subtitle-1 font-weight-bold mb-2 text-info">👥 Arrendatario</h4>
                      <p><strong>Nombre:</strong> {{ inquilino?.titular }} {{ inquilino?.surname }}</p>
                      <p><strong>Email:</strong> {{ inquilino?.email }}</p>
                      <p><strong>Teléfono:</strong> {{ inquilino?.celular }}</p>
-                  </div>
+                  </div> -->
                </VCol>
             </VRow>
          </VCardText>
@@ -307,7 +308,7 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
                               v-if="typeof value === 'string' && (value.endsWith('.jpg') || value.endsWith('.png') || value.endsWith('.jpeg') || value.startsWith('/storage/') || value.startsWith('http'))">
                               <a :href="value.startsWith('http') ? value : BASE_URL + value" target="_blank"
                                  rel="noopener" style="color: #1976d2; text-decoration: underline;">
-                                 Ver imagen
+                                 Ver
                               </a>
                            </template>
                            <template v-else>

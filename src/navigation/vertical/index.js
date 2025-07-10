@@ -31,7 +31,7 @@ export default [
     icon: { icon: "ri-group-line" },
   },
   {
-    title: "Clientes/Propietarios",
+    title: "Arrendatarios/Propietarios",
     to: { name: "clientes" },
     permissions: "update_propietarios",
     icon: { icon: "ri-group-line" },
@@ -68,30 +68,35 @@ export default [
     ],
   },
   { heading: "Procesos" },
+  // {
+  //   title: "Contratos",
+  //   icon: { icon: "ri-list-check-3" },
+  //   children: [
+  //     {
+  //       title: "Registrar",
+  //       to: "second-page",
+  //       icon: { icon: "ri-computer-line" },
+  //     },
+  //     {
+  //       title: "Listado",
+  //       to: "second-page",
+  //       icon: { icon: "ri-bar-chart-line" },
+  //     },
+  //   ],
+  // },
   {
-    title: "Contratos",
-    icon: { icon: "ri-list-check-3" },
-    children: [
-      {
-        title: "Registrar",
-        to: "second-page",
-        icon: { icon: "ri-computer-line" },
-      },
-      {
-        title: "Listado",
-        to: "second-page",
-        icon: { icon: "ri-bar-chart-line" },
-      },
-    ],
-  },
-  {
-    title: "Recibos/Pagos",
+    title: "Recibos",
     icon: { icon: "ri-bill-line" },
     children: [
       {
+        title: "Crear Recibo",
+        to: "agregar-recibos",
+        permissions: "create_recibos",
+      },
+      {
         title: "Listar",
         to: "recibos",
-        permissions: "crud_danos",
+        permissions: "list_recibos",
       },
     ],
   },
@@ -151,6 +156,12 @@ export default [
         title: "Registrar",
         to: "pago-nuevo",
         permissions: "pago_nuevo",
+        icon: { icon: "ri-money-dollar-circle-line" },
+      },
+      {
+        title: "Agrgar Comprobante",
+        to: "pago-comprobante",
+        permissions: "listado_pagos",
         icon: { icon: "ri-money-dollar-circle-line" },
       },
       {

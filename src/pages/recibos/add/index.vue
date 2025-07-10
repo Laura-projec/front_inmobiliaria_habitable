@@ -117,7 +117,7 @@ const guardarRecibo = async () => {
 
     success_exists.value = 'Recibo guardado correctamente 🚀'
     setTimeout(() => {
-      router.push('/recibos') // Redirige a la lista de recibos
+      router.push('/listRecibos') // Redirige a la lista de recibos
     }, 2000)
 
   } catch (error) {

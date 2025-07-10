@@ -202,6 +202,12 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
+          path: "/pagos/comprobante",
+          name: "pago-comprobante",
+          component: () => import("@/pages/pagos/add/pagoComprobanteForm.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
           path: "/pagos/list",
           name: "pagos-listado",
           component: () => import("@/pages/pagos/list/index.vue"),
