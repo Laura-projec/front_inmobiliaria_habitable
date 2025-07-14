@@ -9,6 +9,7 @@ import {
 } from '@layouts/components'
 import { useLayoutConfigStore } from '@layouts/stores/config'
 import { injectionKeyIsVerticalNavHovered } from '@layouts/symbols'
+import logo from '@images/logo-habitable-inmobiliaria.png'
 
 const props = defineProps({
   tag: {
@@ -70,7 +71,7 @@ const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
     :is="props.tag"
     ref="refNav"
     class="layout-vertical-nav"
-    :class="[
+    :class=" [
       {
         'overlay-nav': configStore.isLessThanOverlayNavBreakpoint,
         'hovered': isHovered,
@@ -82,12 +83,8 @@ const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
     <!-- 👉 Header -->
     <div class="nav-header">
       <slot name="nav-header">
-        <RouterLink
-          to="/"
-          class="app-logo app-title-wrapper"
-        >
-          <VNodeRenderer :nodes="layoutConfig.app.logo" />
-
+        <RouterLink to="/" class="app-logo auth-logo logo-large app-title-wrapper">
+          <img :src="logo" alt="Logo Habitable Inmobiliaria" class="logo-img" />
           <Transition name="vertical-nav-app-title">
             <h1
               v-show="!hideTitleAndIcon"
@@ -150,17 +147,29 @@ const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
 </template>
 
 <style lang="scss" scoped>
-.app-logo {
+.app-logo.logo-large {
   display: flex;
   align-items: center;
-  column-gap: 0.5rem;
+  column-gap: 1rem;
+  min-height: 120px;
+}
 
-  .app-logo-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    line-height: 1.75rem;
-    text-transform: capitalize;
-  }
+.logo-img {
+  width: 120px !important;
+  height: 120px !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain;
+  display: block;
+  margin-bottom: 0.5rem;
+  /* Elimina cualquier padding o border del padre */
+}
+
+.app-logo-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 2.2rem;
+  text-transform: capitalize;
 }
 </style>
 

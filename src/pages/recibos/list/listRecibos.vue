@@ -38,7 +38,7 @@ const fetchRecibos = async () => {
     // No agregar filtros, mostrar todo
     console.log('user final', userRole.value, userId.value);
     
-  } else if (userRole.value === 'propietario') {
+  } else if (userRole.value === 'propietarios') {
     endpoint += `propietario_id=${userId.value}&`
   } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
     endpoint += `inquilino_id=${userId.value}&`

@@ -35,6 +35,8 @@ declare module 'vue-router/auto-routes' {
     'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
     'not-authorized': RouteRecordInfo<'not-authorized', '/not-authorized', Record<never, never>, Record<never, never>>,
     'novedades-add': RouteRecordInfo<'novedades-add', '/novedades/add', Record<never, never>, Record<never, never>>,
+    'novedades-list': RouteRecordInfo<'novedades-list', '/novedades/list', Record<never, never>, Record<never, never>>,
+    'pagos-add-pago-comprobante-form': RouteRecordInfo<'pagos-add-pago-comprobante-form', '/pagos/add/pagoComprobanteForm', Record<never, never>, Record<never, never>>,
     'pagos-add-pago-form': RouteRecordInfo<'pagos-add-pago-form', '/pagos/add/pagoForm', Record<never, never>, Record<never, never>>,
     'pagos-list': RouteRecordInfo<'pagos-list', '/pagos/list', Record<never, never>, Record<never, never>>,
     'pagos-list-id': RouteRecordInfo<'pagos-list-id', '/pagos/list/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,

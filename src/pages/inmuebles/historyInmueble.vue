@@ -9,6 +9,8 @@ const router = useRouter()
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
 const isOwner = computed(() => {
+   console.log('user inicial is owner', user.value);
+   
    const roleId = user.value.role.id;
    return roleId === 39; // 39: Propietario, 1: Administrador, 2: Super Admin
 })
@@ -27,7 +29,7 @@ const tabs = [
    { value: 'danos', label: 'Daños', icon: 'ri-tools-line' },
    { value: 'novedades', label: 'Novedades', icon: 'ri-file-list-line' },
    { value: 'pagos', label: 'Pagos', icon: 'ri-money-dollar-circle-line' },
-   { value: 'recibos', label: 'Recibos', icon: 'ri-file-text-line' },
+   { value: 'recibos', label: 'Servicios Publicos', icon: 'ri-file-text-line' },
    { value: 'contratos', label: 'Contratos', icon: 'ri-file-paper-line' },
 ]
 
@@ -59,8 +61,11 @@ const showModal = ref(false)
 // Obtener inmuebles del usuario según el rol
 const getInmuebles = async () => {
    try {
+   console.log('user inicial', user.value);
+   console.log('user final', userRole.value, userId.value);
+   
       let endpoint = '/inmuebles'
-      if (userRole.value === 'propietario') {
+      if (userRole.value === 'propietarios') {
          endpoint = `/inmuebles?user_id=${userId.value}`
       } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
          endpoint = `/inmuebles?inquilino_id=${userId.value}`
@@ -70,7 +75,7 @@ const getInmuebles = async () => {
       inmuebles.value = resp.inmuebles || []
       inmuebleSeleccionado.value = inmuebles.value[0] || null
       if (inmuebleSeleccionado.value) {
-         if (userRole.value === 'propietario') {
+         if (userRole.value === 'propietarios') {
             await getPropietario(inmuebleSeleccionado.value.users_id)
             await getInquilino(inmuebleSeleccionado.value.id)
          }
@@ -129,7 +134,7 @@ const getTimelineData = async (tab) => {
       }
       let endpoint = `/${inmuebleId}/${tab}`
       // Si es propietario, filtra por user_id
-      if (userRole.value === 'propietario') {
+      if (userRole.value === 'propietarios') {
          endpoint += `?user_id=${userId.value}`
       } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
          endpoint += `?inquilino_id=${userId.value}`

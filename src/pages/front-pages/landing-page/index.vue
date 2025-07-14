@@ -1,7 +1,6 @@
 <script setup>
 import Navbar from '@/views/front-pages/front-page-navbar.vue'
-
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useConfigStore } from '@core/stores/config'
 import HeroSection from '@/views/front-pages/hero-section.vue'
 import Features from '@/views/front-pages/features.vue'
@@ -9,9 +8,24 @@ import CustomersReview from '@/views/front-pages/customers-review.vue'
 import HelpCenterLandingKnowledgeBase from '@/views/front-pages/HelpCenterLandingKnowledgeBase.vue'
 import ContactUs from '@/views/front-pages/contact-us.vue'
 import FrontPageFooter from '@/views/front-pages/front-page-footer.vue'
+import { onMounted, watch } from 'vue'
 
 const store = useConfigStore()
 const router = useRouter()
+const route = useRoute()
+
+// --- BLOQUE PARA SCROLL SUAVE AL HASH ---
+function scrollToHash() {
+  if (route.hash) {
+    setTimeout(() => {
+      const el = document.querySelector(route.hash)
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+    }, 300)
+  }
+}
+onMounted(scrollToHash)
+watch(() => route.hash, scrollToHash)
+// --- FIN BLOQUE SCROLL ---
 
 store.skin = 'default'
 definePage({ meta: { layout: 'blank' } })
@@ -43,13 +57,11 @@ const categories = [
   {
     title: "Misión",
     description: "Habitable Inmobiliaria es una  empresa Quindiana enfocada al asesoramiento y ventas de bienes inmuebles, con presencia en Armenia y Cali, orientando sus servicios a la inversión pertinente, y con ello satisfacer sus necesidades y expectativas.",
-    // icon: "mdi-mission"
   },
   {
     title: "Visión",
     description: "Estar en uno de los cinco primeros puestos a nivel nacional en la industria de bienes raíces, posicionándose por sus buenas prácticas y desarrollo de marca en las principales redes sociales, mediante la generación de contenido de valor y diversificación de portafolio financiero.",
-    // icon: "mdi-eye",
-  }, 
+  },
 ]
 </script>
 
@@ -65,14 +77,14 @@ const categories = [
     <div :style="{ 'background-color': 'rgb(var(--v-theme-surface))' }">
       <CustomersReview />
     </div>
-    
+
     <HelpCenterLandingKnowledgeBase :categories="categories" />
-    
+
     <div :style="{ 'background-color': 'rgb(var(--v-theme-surface))' }">
       <ContactUs ref="refContact" />
     </div>
 
-    <FrontPageFooter/>
+    <FrontPageFooter />
 
 
     <!-- <h1>Bienvenido a la Landing Page</h1>

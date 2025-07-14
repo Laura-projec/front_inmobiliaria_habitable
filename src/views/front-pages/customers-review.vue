@@ -42,33 +42,35 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="customer-reviews">
-    <!-- 👉 Headers  -->
-    <div class="headers d-flex justify-center flex-column align-center mb-8">
-      <div class="d-flex gap-x-3 mb-6">
-        <img :src="sectionTitleIcon" alt="section title icon" height="24" width="25">
-        <div class="text-body-1 text-high-emphasis font-weight-medium">
-          OPINIONES DE CLIENTES
+  <div class="customer-reviews" id="opiniones">
+
+    <div class="customer-reviews">
+      <!-- 👉 Headers  -->
+      <div class="headers d-flex justify-center flex-column align-center mb-8">
+        <div class="d-flex gap-x-3 mb-6">
+          <img :src="sectionTitleIcon" alt="section title icon" height="24" width="25">
+          <div class="text-body-1 text-high-emphasis font-weight-medium">
+            OPINIONES DE CLIENTES
+          </div>
         </div>
+
+        <div class="mb-2 text-center">
+          <span class="text-h4 d-inline-block font-weight-bold" style="line-height: 2rem;">
+            Historias de éxito
+          </span> <span class="text-h5 d-inline-block">de clientes</span>
+        </div>
+
+        <p class="text-body-1 font-weight-medium text-center">
+          Vea lo que nuestros clientes tienen que decir sobre su experiencia.
+        </p>
       </div>
 
-      <div class="mb-2 text-center">
-        <span class="text-h4 d-inline-block font-weight-bold" style="line-height: 2rem;">
-          Historias de éxito
-        </span> <span class="text-h5 d-inline-block">de clientes</span>
-      </div>
-
-      <p class="text-body-1 font-weight-medium text-center">
-        Vea lo que nuestros clientes tienen que decir sobre su experiencia.
-      </p>
-    </div>
-
-    <div class="swiper-reviews-carousel py-4 mb-6">
-      <!-- eslint-disable vue/attribute-hyphenation -->
-      <swiper-container slides-per-view="1" space-between="10" centered-slides="true" loop="true" autoplay-delay="3000"
-        autoplay-disable-on-interaction="false" events-prefix="swiper-" :pagination="{
-          clickable: 'true',
-        }" :injectStyles="[
+      <div class="swiper-reviews-carousel py-4 mb-6">
+        <!-- eslint-disable vue/attribute-hyphenation -->
+        <swiper-container slides-per-view="1" space-between="10" centered-slides="true" loop="true"
+          autoplay-delay="3000" autoplay-disable-on-interaction="false" events-prefix="swiper-" :pagination="{
+            clickable: 'true',
+          }" :injectStyles="[
           `
           .swiper-pagination{
             position: static;
@@ -92,51 +94,52 @@ onMounted(() => {
           spaceBetween: 20,
         },
       }">
-        <swiper-slide v-for="(data, index) in reviewData" :key="index">
-          <VCard class="h-100 d-flex align-stretch">
-            <VCardText class="pa-4 pa-sm-6 pa-md-8 d-flex flex-column justify-space-between align-center review-card">
-              <img :src="data.img" style="block-size: 1.75rem;">
+          <swiper-slide v-for="(data, index) in reviewData" :key="index">
+            <VCard class="h-100 d-flex align-stretch">
+              <VCardText class="pa-4 pa-sm-6 pa-md-8 d-flex flex-column justify-space-between align-center review-card">
+                <img :src="data.img" style="block-size: 1.75rem;">
 
-              <div class="text-body-1 text-high-emphasis text-center  review-description">
-                {{ data.desc }}
-              </div>
-
-              <div>
-                <VRating :model-value="data.rating" color="warning" readonly />
-              </div>
-
-              <div class="text-center">
-                <div class="text-body-1 text-high-emphasis font-weight-medium">
-                  {{ data.name }}
+                <div class="text-body-1 text-high-emphasis text-center  review-description">
+                  {{ data.desc }}
                 </div>
 
-                <div class="text-body-2">
-                  {{ data.position }}
+                <div>
+                  <VRating :model-value="data.rating" color="warning" readonly />
                 </div>
-              </div>
-            </VCardText>
-          </VCard>
-        </swiper-slide>
-      </swiper-container>
-    </div>
 
-    <!-- 👉 Brand-logo Swiper  -->
-    <div class="swiper-brands-carousel mt-4">
-      <swiper-container slides-per-view="1" loop="true" events-prefix="swiper-" :breakpoints="{
-        992: {
-          slidesPerView: 5,
-        },
-        768: {
-          centeredSlides: true,
-          slidesPerView: 3,
-        },
-        580: {
-          centeredSlides: true,
-          slidesPerView: 2,
-        },
-      }">
+                <div class="text-center">
+                  <div class="text-body-1 text-high-emphasis font-weight-medium">
+                    {{ data.name }}
+                  </div>
 
-      </swiper-container>
+                  <div class="text-body-2">
+                    {{ data.position }}
+                  </div>
+                </div>
+              </VCardText>
+            </VCard>
+          </swiper-slide>
+        </swiper-container>
+      </div>
+
+      <!-- 👉 Brand-logo Swiper  -->
+      <div class="swiper-brands-carousel mt-4">
+        <swiper-container slides-per-view="1" loop="true" events-prefix="swiper-" :breakpoints="{
+          992: {
+            slidesPerView: 5,
+          },
+          768: {
+            centeredSlides: true,
+            slidesPerView: 3,
+          },
+          580: {
+            centeredSlides: true,
+            slidesPerView: 2,
+          },
+        }">
+
+        </swiper-container>
+      </div>
     </div>
   </div>
 </template>
@@ -196,9 +199,11 @@ swiper-container::part(pagination) {
 }
 
 .review-card {
-  max-width: 300px; /* Ajusta el ancho de la tarjeta */
+  max-width: 300px;
+  /* Ajusta el ancho de la tarjeta */
   height: auto;
-  overflow: hidden; /* Esconde cualquier contenido que se desborde */
+  overflow: hidden;
+  /* Esconde cualquier contenido que se desborde */
 }
 
 .review-description {
