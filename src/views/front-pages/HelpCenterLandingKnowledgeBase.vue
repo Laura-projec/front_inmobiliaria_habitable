@@ -10,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <VContainer id="features">
+  <VContainer id="quienes-somos">
     <div class="feature-cards">
       <!-- Título principal -->
       <div class="headers d-flex justify-center flex-column align-center mb-6">

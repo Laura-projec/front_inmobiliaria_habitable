@@ -120,7 +120,7 @@ watch(() => form.value.user_type, (val) => {
       form.value.inquilino_historico_id = inquilinosList.value[0]?.id || null
     }
     form.value.user_id = form.value.inquilino_historico_id
-  } else if (val === 'propietario' && form.value.propietario) {
+  } else if (val === 'propietarios' && form.value.propietario) {
     form.value.user_id = form.value.propietario.id
     form.value.inquilino_historico_id = null
   }
@@ -222,7 +222,7 @@ const enviarFormulario = async () => {
           </VCol>
 
           <!-- Mostrar usuario seleccionado -->
-          <VCol cols="12" md="6" v-if="form.user_type === 'propietario' && form.propietario">
+          <VCol cols="12" md="6" v-if="form.user_type === 'propietarios' && form.propietario">
             <VTextField :value="form.propietario?.name" label="Propietario seleccionado" outlined readonly
               class="mb-4" />
           </VCol>

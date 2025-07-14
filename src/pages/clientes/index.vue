@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink, useRouter } from 'vue-router';
-import { VCardText } from 'vuetify/components'; 
+import { VCardText } from 'vuetify/components';
 import EditCliente from '@/components/inmobiliaria/cliente/EditCliente.vue';
 import AddCliente from '@/components/inmobiliaria/cliente/AddCliente.vue';
 import DeleteClienteDialog from '@/components/inmobiliaria/cliente/DeleteClienteDialog.vue';
@@ -41,14 +41,18 @@ const headers = [
     {
         title: 'Cliente',
         key: 'full_name',
-    }, 
+    },
     {
         title: 'Tipo Documento',
         key: 'tipo_documento',
     },
+    // {
+    //     title: 'Numero Documento',
+    //     key: 'numero_documento',
+    // },
     {
-        title: 'Numero Documento',
-        key: 'numero_documento',
+        title: 'Inmueble',
+        key: 'inmueble_direccion',
     },
     {
         title: 'Rol',
@@ -86,10 +90,19 @@ const getClientes = async () => {
         onResponseError(response) {
             console.log('response.response', response.response);
         }
-    }) 
-    ClientList.value = JSON.parse(JSON.stringify(resp.clients.data)) 
-    console.log(resp);
-    
+    })
+
+    // Mapea los clientes y agrega inmueble_direccion desde clients_with_inmueble
+    const withInmueble = resp.clients_with_inmueble
+    const data = resp.clients.data.map(cliente => {
+        const found = withInmueble.find(c => c.id === cliente.id)
+        return {
+            ...cliente,
+            inmueble_direccion: found ? found.inmueble_direccion : 'Sin inmueble asignado'
+        }
+    })
+
+    ClientList.value = JSON.parse(JSON.stringify(data))
     roles.value = resp.roles
 }
 
@@ -164,11 +177,11 @@ definePage({
                 </template>
                 <!-- Actions -->
                 <template #item.actions="{ item }">
-                    <div class="d-flex gap-1"> 
+                    <div class="d-flex gap-1">
                         <IconBtn size="small" @click="editItem(item)">
                             <VIcon icon="ri-pencil-line" />
                         </IconBtn>
-                        
+
                         <IconBtn size="small" @click="deleteItem(item)">
                             <VIcon icon="ri-delete-bin-line" />
                         </IconBtn>
@@ -188,10 +201,10 @@ definePage({
     <VCardText v-if="iseEditClientVisible">
         <!-- Aquí mostramos el formulario de agregar Cliente, solo cuando isAddClientVisible es true -->
         <div>
-            <EditCliente @close="handleCloseForm" :clientSelected="cliente_selected" :roles="roles"/>
+            <EditCliente @close="handleCloseForm" :clientSelected="cliente_selected" :roles="roles" />
         </div>
     </VCardText>
-    <DeleteClienteDialog v-if="cliente_selected_deleted" :clientSelected="cliente_selected_deleted" @clientUpdated="getClientes"
-        v-model:is-dialog-visible="isDeleteClientDialogVisible" />
+    <DeleteClienteDialog v-if="cliente_selected_deleted" :clientSelected="cliente_selected_deleted"
+        @clientUpdated="getClientes" v-model:is-dialog-visible="isDeleteClientDialogVisible" />
 
 </template>

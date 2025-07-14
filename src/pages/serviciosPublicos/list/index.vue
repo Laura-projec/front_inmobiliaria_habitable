@@ -31,7 +31,7 @@ const getServiciosPublicos = async () => {
 
   try {
     let endpoint = '/public-services'
-    if (userRole.value === 'propietario') {
+    if (userRole.value === 'propietarios') {
       endpoint = `/public-services?propietario_id=${userId.value}`
     } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
       endpoint = `/public-services?inmueble_id=${userInmuebleId.value}`

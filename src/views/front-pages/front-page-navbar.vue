@@ -2,9 +2,6 @@
 import { useWindowScroll } from '@vueuse/core'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { useDisplay } from 'vuetify'
-import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
-import navImg from '@images/front-pages/misc/nav-img.png'
-import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 
 const props = defineProps({
@@ -29,26 +26,66 @@ watch(() => display, () => {
   return display.mdAndUp ? sidebar.value = false : sidebar.value
 }, { deep: true })
 
+// Menú sin "Tus propiedades"
+const menuItems = [
+  { label: 'Inicio', hash: '#inicio' },
+  { label: 'Inmuebles disponibles', external: true, url: 'https://inmobiliariahabitable.com/' },
+  { label: 'Útiles', hash: '#features' },
+  { label: 'Opiniones', hash: '#opiniones' },
+  { label: 'Quienes Somos', hash: '#quienes-somos' },
+  { label: 'Contáctenos', hash: '#contactenos' },
+]
+
+// Botón para login
+function goToLogin() {
+  router.push({ name: 'login' })
+}
+
+// Función para manejar el click del menú
+function handleMenuClick(item) {
+  sidebar.value = false
+  if (item.external) {
+    window.open(item.url, '_blank')
+    return
+  }
+  if (route.name === 'landing') {
+    if (item.hash) {
+      const el = document.querySelector(item.hash)
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+    }
+  } else {
+    router.push({ name: 'landing', hash: item.hash })
+  }
+}
 </script>
 
 <template>
   <!-- 👉 Navigation drawer for mobile devices -->
   <VNavigationDrawer v-model="sidebar" disable-resize-watcher>
     <PerfectScrollbar :options="{ wheelPropagation: false }" class="h-100">
-      <!-- Nav items -->
       <div>
         <div class="d-flex flex-column gap-y-4 pa-4">
-          <RouterLink
-            v-for="(item, index) in ['Inicio', 'Inmuebles disponibles', 'Profesionales a tu servicio', 'Contáctenos', 'Tus propiedades']"
-            :key="index" :to="{ name: 'front-pages-landing-page', hash: `#${item.toLowerCase().replace(' ', '-')}` }"
-            class="font-weight-medium"
-            :class="[props.activeId?.toLocaleLowerCase().replace('-', ' ') === item.toLocaleLowerCase() ? 'active-link' : 'text-high-emphasis']">
-            {{ item }}
-          </RouterLink>
+          <button
+            v-for="(item, index) in menuItems"
+            :key="index"
+            class="nav-link font-weight-medium"
+            :class="[props.activeId?.toLocaleLowerCase().replace('-', ' ') === item.label.toLocaleLowerCase() ? 'active-link' : '']"
+            @click="handleMenuClick(item)"
+            style="background:none;border:none;text-align:left;padding:0;width:100%;"
+          >
+            {{ item.label }}
+          </button>
+          <!-- Botón destacado para login -->
+          <VBtn
+            color="primary"
+            class="mt-4"
+            block
+            @click="goToLogin"
+          >
+            Tus propiedades
+          </VBtn>
         </div>
       </div>
-
-      <!-- Navigation drawer close icon -->
       <VIcon id="navigation-drawer-close-btn" icon="ri-close-line" size="20" @click="sidebar = !sidebar" />
     </PerfectScrollbar>
   </VNavigationDrawer>
@@ -60,14 +97,9 @@ watch(() => display, () => {
       :style="y > 20 ? '' : `background-color: rgba(var(--v-theme-surface),${props.navbarInitialOpacity})`"
       height="100">
 
-      <!-- toggle icon for mobile device -->
       <VAppBarNavIcon :class="$vuetify.display.mdAndUp ? 'd-none' : 'd-inline-block'" class="ms-0 me-1"
         color="high-emphasis" @click="() => sidebar = !sidebar" />
 
-      <!-- <div class="logo-container">
-        <VNodeRenderer :nodes="themeConfig.app.logo" />
-      </div> -->
-      <!-- Title and Landing page sections -->
       <div class="d-flex align-center">
         <VAppBarTitle class="me-3 me-sm-6">
           <RouterLink to="/" class="d-flex gap-x-4" :class="$vuetify.display.mdAndUp ? 'd-none' : 'd-block'">
@@ -83,25 +115,25 @@ watch(() => display, () => {
         <!-- landing page sections for desktop -->
         <div :class="$vuetify.display.mdAndUp ? 'd-flex' : 'd-none'"
           class="text-base justify-center align-center gap-x-2">
-          <RouterLink
-            v-for="(item, index) in ['Inicio', 'Inmuebles disponibles', 'Útiles','Opiniones','Quienes Somos', 'Contáctenos']"
-            :key="index" :to="{ name: 'front-pages-landing-page', hash: `#${item.toLowerCase().replace(' ', '-')}` }"
+          <button
+            v-for="(item, index) in menuItems"
+            :key="index"
             class="nav-link font-weight-medium"
-            :class="[props.activeId?.toLocaleLowerCase().replace('-', ' ') === item.toLocaleLowerCase() ? 'active-link' : '']">
-            {{ item }}
-          </RouterLink>
-        </div>
-
-        <!-- Button only visible in desktop view -->
-        <div class="d-flex gap-x-4 align-center">
-          <!-- Tus propiedades button visible on desktop -->
-          <VBtn v-if="$vuetify.display.lgAndUp" prepend-icon="ri-login-box-line" variant="elevated" color="primary">
-            <RouterLink to="/login" target="_blank" class="nav-link font-weight-medium">
-              Tus propiedades 
-            </RouterLink>
+            :class="[props.activeId?.toLocaleLowerCase().replace('-', ' ') === item.label.toLocaleLowerCase() ? 'active-link' : '']"
+            @click="handleMenuClick(item)"
+            style="background:none;border:none;text-align:left;padding:0;"
+          >
+            {{ item.label }}
+          </button>
+          <!-- Botón destacado para login -->
+          <VBtn
+            color="primary"
+            class="ms-4"
+            @click="goToLogin"
+          >
+            Tus propiedades
           </VBtn>
         </div>
-
       </div>
     </VAppBar>
   </div>
@@ -274,5 +306,4 @@ watch(() => display, () => {
 // .front-page-navbar .v-toolbar__content {
 //   padding-top: 30px;
 //   /* Ajusta según el tamaño del logo */
-// }
-</style>
+// }</style>

@@ -45,10 +45,11 @@ const aprobarRecibo = async () => {
     aprobacionMsg.value = 'Recibo aprobado correctamente.'
     await getRecibosPendientes()
     showReciboModal.value = false
+    aprobacionMsg.value = 'Redirigiendo...'
     setTimeout(() => {
       router.push("/AgregarRecibos");
       aprobacionMsg.value = null
-    }, 3000)
+    }, 1000)
   } catch (e) {
     aprobacionMsg.value = 'No se pudo aprobar el recibo.'
   } finally {
