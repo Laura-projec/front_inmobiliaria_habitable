@@ -9,8 +9,6 @@ const router = useRouter()
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
 const isOwner = computed(() => {
-   console.log('user inicial is owner', user.value);
-   
    const roleId = user.value.role.id;
    return roleId === 39; // 39: Propietario, 1: Administrador, 2: Super Admin
 })
@@ -25,6 +23,7 @@ const caracteristicas = ref([])
 const activeTab = ref('danos')
 const direccion = ref('')
 const observaciones = ref('')
+const valor = ref(0) // <-- Asegura que sea número por defecto
 const tabs = [
    { value: 'danos', label: 'Daños', icon: 'ri-tools-line' },
    { value: 'novedades', label: 'Novedades', icon: 'ri-file-list-line' },
@@ -61,21 +60,17 @@ const showModal = ref(false)
 // Obtener inmuebles del usuario según el rol
 const getInmuebles = async () => {
    try {
-   console.log('user inicial', user.value);
-   console.log('user final', userRole.value, userId.value);
-   
       let endpoint = '/inmuebles'
       if (userRole.value === 'propietarios') {
          endpoint = `/inmuebles?user_id=${userId.value}`
       } else if (userRole.value === 'arrendatario' || userRole.value === 'inquilino') {
          endpoint = `/inmuebles?inquilino_id=${userId.value}`
       }
-      // Si es admin o super-admin, endpoint queda igual
       const resp = await $api(endpoint, { method: 'GET' })
       inmuebles.value = resp.inmuebles || []
       inmuebleSeleccionado.value = inmuebles.value[0] || null
       if (inmuebleSeleccionado.value) {
-         if (userRole.value === 'propietarios') {
+         if (userRole.value !== 'arrendatario') {
             await getPropietario(inmuebleSeleccionado.value.users_id)
             await getInquilino(inmuebleSeleccionado.value.id)
          }
@@ -83,6 +78,7 @@ const getInmuebles = async () => {
          await getTimelineData(activeTab.value)
          direccion.value = inmuebleSeleccionado.value.direccion
          observaciones.value = inmuebleSeleccionado.value.observaciones
+         valor.value = Number(inmuebleSeleccionado.value.valor_arrendamiento) || 0
       }
    } catch (error) {
       console.error('Error al obtener inmuebles:', error)
@@ -185,7 +181,7 @@ watch(inmuebleSeleccionado, async (nuevoInmuebleId) => {
       timelineData.value = [];
 
       // Cargar nuevos datos del inmueble
-      if (isOwner.value) {
+      if (userRole.value !== 'arrendatario') {
          await getPropietario(nuevoInmueble.users_id);
          await getInquilino(nuevoInmueble.id);
       }
@@ -193,6 +189,7 @@ watch(inmuebleSeleccionado, async (nuevoInmuebleId) => {
       await getTimelineData(activeTab.value);
       direccion.value = nuevoInmueble.direccion;
       observaciones.value = nuevoInmueble.observaciones;
+      valor.value = Number(nuevoInmueble.valor_arrendamiento) || 0; // <-- asegura número
    }
 });
 const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
@@ -215,6 +212,14 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
             <VRow dense>
                <VCol cols="12" md="6">
                   <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">Información del Inmueble</h4>
+                  <p>
+                     <strong>Valor del Inmueble:</strong>
+                     {{
+                        valor
+                           ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'COP' }).format(valor)
+                     : 'No disponible'
+                     }}
+                  </p>
                   <p><strong>Dirección:</strong> {{ direccion }}</p>
                   <p><strong>Observaciones:</strong> {{ observaciones }}</p>
                   <p><strong>Características:</strong></p>
@@ -225,7 +230,7 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
                   </ul>
                </VCol>
 
-               <VCol cols="12" md="6" v-if="!isTenant">
+               <VCol cols="12" md="6" v-if="userRole !== 'arrendatario'">
                   <h4 class="text-subtitle-1 font-weight-bold mb-2 text-success">👤 Propietario</h4>
                   <p><strong>Nombre:</strong> {{ propietario?.name }} {{ propietario?.surname }}</p>
                   <p><strong>Email:</strong> {{ propietario?.email }}</p>
