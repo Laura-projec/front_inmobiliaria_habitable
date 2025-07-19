@@ -13,11 +13,15 @@ import { ref } from 'vue'
 import logo from '@images/logo-habitable-inmobiliaria.png'
 
 
+
 const form = ref({
   email: '',
   password: '',
   remember: false,
+  aceptaDatos: false,
 })
+
+const showPoliticaModal = ref(false)
 
 const route = useRoute()
 const router = useRouter()
@@ -33,6 +37,10 @@ definePage({
 })
 
 const login = async () => {
+  if (!form.value.aceptaDatos) {
+    error_exists.value = 'Debes aceptar la política de tratamiento de datos para continuar.'
+    return
+  }
   try {
     error_exists.value = null;
     success_exists.value = null;
@@ -46,9 +54,14 @@ const login = async () => {
         error_exists.value = response.response._data.error;
       }
     })
-    // console.log(resp);
     localStorage.setItem('token', resp.access_token);
     localStorage.setItem('user', JSON.stringify(resp.user));
+    // Registrar aceptación de tratamiento de datos
+    await $api('aceptacion-tratamiento-datos', {
+      method: 'POST',
+      body: { aceptado: true },
+      headers: { Authorization: `Bearer ${resp.access_token}` },
+    })
     success_exists.value = true;
 
     setTimeout(async () => {
@@ -120,14 +133,57 @@ const authV2LoginIllustration = useGenerateImageVariant(authV2LoginIllustrationL
                   Error: <strong>{{ error_exists }}</strong>
                 </VAlert>
 
-                <!-- remember me checkbox -->
-                <div class="d-flex align-center justify-space-between flex-wrap my-6 gap-x-2">
-                  <VCheckbox v-model="form.remember" label="Recordarme" />
 
+                <!-- Tratamiento de datos -->
+                <div class="d-flex align-center flex-wrap my-4 gap-x-2">
+                  <VCheckbox v-model="form.aceptaDatos"
+                    :rules="[v => !!v || 'Debes aceptar la política de tratamiento de datos']" color="primary"
+                    class="mr-2" />
+                  <span class="text-body-2">
+                    Acepto la
+                    <a href="#" @click.prevent="showPoliticaModal = true"
+                      class="text-primary text-decoration-underline">
+                      política de tratamiento de datos
+                    </a>
+                  </span>
+                </div>
+
+                <!-- remember me checkbox -->
+                <div class="d-flex align-center justify-space-between flex-wrap my-2 gap-x-2">
+                  <VCheckbox v-model="form.remember" label="Recordarme" />
                   <a class="text-primary" href="#">
                     Si olvido su contraseña comuniquese con la administracion!
                   </a>
                 </div>
+
+                <VDialog v-model="showPoliticaModal" max-width="700px">
+                  <VCard>
+                    <VCardTitle class="font-weight-bold">Política de Tratamiento de Datos</VCardTitle>
+                    <VCardText style="max-height: 60vh; overflow-y: auto;">
+                      <p>
+                        Resumen: Tus datos personales serán tratados conforme a la Ley 1581 de 2012 para fines
+                        contractuales, comerciales, legales y administrativos. Puedes ejercer tus derechos de acceso,
+                        corrección y supresión contactando a la administración.
+                      </p>
+                      <p>
+                        Al aceptar, autorizas el tratamiento de tus datos bajo los principios de legalidad, finalidad,
+                        libertad, veracidad, transparencia, acceso y circulación restringida, seguridad y
+                        confidencialidad. Tienes derecho a conocer, actualizar, rectificar y suprimir tus datos, así
+                        como a solicitar información sobre su uso.
+                      </p>
+                      <p class="mt-2">
+                        <a href="/politica-tratamiento-datos.html" target="_blank" rel="noopener"
+                          class="text-primary text-decoration-underline">
+                          Ver política completa de tratamiento de datos personales
+                        </a>
+                      </p>
+                    </VCardText>
+                    <VCardActions>
+                      <VSpacer />
+                      <VBtn color="primary" @click="showPoliticaModal = false">Cerrar</VBtn>
+                    </VCardActions>
+                  </VCard>
+                </VDialog>
 
                 <!-- login button -->
                 <VBtn block type="submit">
