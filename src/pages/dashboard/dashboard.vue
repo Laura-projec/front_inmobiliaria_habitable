@@ -18,6 +18,9 @@ const showReciboModal = ref(false)
 const aprobando = ref(false)
 const aprobacionMsg = ref(null)
 const router = useRouter()
+// Dashboard profesional por inmueble
+const reportes = ref([])
+const isLoadingReportes = ref(false)
 
 const getRecibosPendientes = async () => {
   isLoadingRecibos.value = true
@@ -35,6 +38,20 @@ const verRecibo = (recibo) => {
   reciboSeleccionado.value = recibo
   aprobacionMsg.value = null
   showReciboModal.value = true
+}
+
+// Cargar reportes agrupados por inmueble usando el endpoint novedades/reporte-completo (sin parámetro)
+const cargarReportes = async () => {
+  isLoadingReportes.value = true
+  try {
+    const resp = await $api('novedades/reporte-completo', { method: 'GET' })
+    // El backend retorna { reporte: [...] }
+    reportes.value = Array.isArray(resp.reporte) ? resp.reporte : []
+  } catch (e) {
+    reportes.value = []
+  } finally {
+    isLoadingReportes.value = false
+  }
 }
 
 const aprobarRecibo = async () => {
@@ -57,7 +74,8 @@ const aprobarRecibo = async () => {
   }
 }
 
-onMounted(getRecibosPendientes)
+onMounted(getRecibosPendientes )
+onMounted(cargarReportes)
 const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
 
 </script>
@@ -143,5 +161,48 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
         </VCardActions>
       </VCard>
     </VDialog>
+    <!-- Card profesional por inmueble -->
+    <VRow class="mt-4">
+      <VCol cols="12">
+        <div v-if="isLoadingReportes" class="text-center my-8">
+          <VProgressCircular indeterminate color="primary" size="48" />
+        </div>
+        <VAlert v-else-if="!isLoadingReportes && reportes.length === 0" type="info" class="my-8">
+          No hay reportes de inmuebles disponibles.
+        </VAlert>
+      </VCol>
+      <VCol v-for="reporte in reportes" :key="reporte.inmueble_id + '-' + reporte.user_id" cols="12" md="6" lg="4">
+        <VCard elevation="2" class="pa-4 mb-6">
+          <VCardTitle class="font-weight-bold text-h6 mb-2">
+            Inmueble #{{ reporte.inmueble_id }} - {{ reporte.inmueble_direccion || 'Sin dirección' }}
+          </VCardTitle>
+          <VCardText>
+            <div class="mb-2">
+              <strong>Arrendatario:</strong> {{ reporte.usuario_nombre || '-' }}
+            </div>
+            <div>
+              <span>Total novedades: </span>
+              <strong>{{ reporte.total }}</strong>
+            </div>
+            <div class="mt-2">
+              <strong>Listado de novedades:</strong>
+              <VList density="compact" class="mt-1">
+                <VListItem v-for="novedad in reporte.novedades" :key="novedad.id">
+                  <VListItemTitle>
+                    <span class="font-weight-bold">{{ novedad.nombre }}</span> - {{ novedad.item_nombre }}
+                  </VListItemTitle>
+                  <VListItemSubtitle>
+                    <span class="text-grey">{{ novedad.descripcion }}</span><br>
+                    <span>Fecha: {{ novedad.fecha }}</span> |
+                    <span>Estado: <VChip :color="novedad.estado && novedad.estado.toLowerCase() === 'pendiente' ? 'warning' : 'success'" size="x-small">{{ novedad.estado }}</VChip></span> |
+                    <span>Valor: {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(Number(novedad.valor)) }}</span>
+                  </VListItemSubtitle>
+                </VListItem>
+              </VList>
+            </div>
+          </VCardText>
+        </VCard>
+      </VCol>
+    </VRow>
   </VRow>
 </template>

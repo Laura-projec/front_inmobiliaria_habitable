@@ -57,7 +57,7 @@ onMounted(async () => {
       </VRow>
 
       <!-- Minimalista: Inquilinos con novedades activas -->
-      <div v-if="inquilinosNovedades.length" class="mt-6">
+      <!-- <div v-if="inquilinosNovedades.length" class="mt-6">
         <h6 class="text-h6 mb-2">Inquilinos con novedades activas</h6>
         <VTable density="compact" class="elevation-1 rounded">
           <thead>
@@ -85,7 +85,7 @@ onMounted(async () => {
       <div v-else class="text-disabled text-center mt-6">
         <VIcon icon="ri-user-search-line" size="28" class="mb-1" />
         No hay inquilinos con novedades activas.
-      </div>
+      </div> -->
     </VCardText>
   </VCard>
 </template>
