@@ -217,7 +217,7 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
                      {{
                         valor
                            ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'COP' }).format(valor)
-                     : 'No disponible'
+                           : 'No disponible'
                      }}
                   </p>
                   <p><strong>Dirección:</strong> {{ direccion }}</p>
@@ -315,9 +315,9 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
                         <li v-for="(value, key) in modalData.extra" :key="key">
                            <strong>{{ key }}:</strong>
                            <template
-                              v-if="typeof value === 'string' && (value.endsWith('.jpg') || value.endsWith('.png') || value.endsWith('.jpeg') || value.startsWith('/storage/') || value.startsWith('http'))">
+                              v-if="typeof value === 'string' && (value.endsWith('.jpg') || value.endsWith('.png') || value.endsWith('.jpeg') || value.endsWith('.pdf') || value.startsWith('/storage/'))">
                               <a
-                                :href="value.startsWith('http') ? value : (BASE_URL.replace(/\/$/, '') + (value.startsWith('/') ? value : '/' + value))"
+                                :href="value.startsWith(BASE_URL) ? value : BASE_URL.replace(/\/$/, '') + (value.startsWith('/') ? value : '/' + value)"
                                 target="_blank"
                                 rel="noopener"
                                 style="color: #1976d2; text-decoration: underline;"
