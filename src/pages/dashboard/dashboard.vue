@@ -76,8 +76,7 @@ const aprobarRecibo = async () => {
 
 onMounted(getRecibosPendientes )
 onMounted(cargarReportes)
-// const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
-const BASE_URL = 'https://api.inmobiliaria-habitable.com'
+const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
 
 </script>
 
@@ -143,7 +142,7 @@ const BASE_URL = 'https://api.inmobiliaria-habitable.com'
               <img :src="reciboSeleccionado.ruta_imagen_pago" alt="Comprobante"
                 style="max-width:100%;border-radius:10px;border:1px solid #eee;" />
               <div class="mt-2">
-                <a :href="reciboSeleccionado.ruta_imagen_pago.startsWith('http') ? reciboSeleccionado.ruta_imagen_pago : BASE_URL + reciboSeleccionado.ruta_imagen_pago"
+                <a :href="BASE_URL + reciboSeleccionado.ruta_imagen_pago"
                   target="_blank" rel="noopener" style="color: #1976d2; text-decoration: underline;">
                   Ver imagen en nueva pestaña
                 </a>

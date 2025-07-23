@@ -192,8 +192,8 @@ watch(inmuebleSeleccionado, async (nuevoInmuebleId) => {
       valor.value = Number(nuevoInmueble.valor_arrendamiento) || 0; // <-- asegura número
    }
 });
-// const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
-const BASE_URL = 'https://api.inmobiliaria-habitable.com'
+const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
+
 </script>
 
 <template>
@@ -315,8 +315,8 @@ const BASE_URL = 'https://api.inmobiliaria-habitable.com'
                         <li v-for="(value, key) in modalData.extra" :key="key">
                            <strong>{{ key }}:</strong>
                            <template
-                              v-if="typeof value === 'string' && (value.endsWith('.jpg') || value.endsWith('.png') || value.endsWith('.jpeg') || value.startsWith('/storage/') || value.startsWith('http'))">
-                              <a :href="value.startsWith('http') ? value : BASE_URL + value" target="_blank"
+                              v-if="typeof value === 'string' && (value.endsWith('.jpg') || value.endsWith('.png') || value.endsWith('.jpeg') || value.startsWith('/storage/') )">
+                              <a :href="BASE_URL + value" target="_blank"
                                  rel="noopener" style="color: #1976d2; text-decoration: underline;">
                                  Ver
                               </a>
