@@ -317,7 +317,7 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
                            <template
                               v-if="typeof value === 'string' && (value.endsWith('.jpg') || value.endsWith('.png') || value.endsWith('.jpeg') || value.endsWith('.pdf') || value.startsWith('/storage/'))">
                               <a
-                                :href="value.replace(/^http:\/\/localhost:8000/, BASE_URL.replace(/\/$/, ''))"
+                                :href="value.replace(/localhost:8000/, BASE_URL.replace(/\/$/, ''))"
                                 target="_blank"
                                 rel="noopener"
                                 style="color: #1976d2; text-decoration: underline;"
