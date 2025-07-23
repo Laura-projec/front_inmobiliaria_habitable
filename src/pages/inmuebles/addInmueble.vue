@@ -300,7 +300,8 @@ const limpiarCamposFormulario = () => {
 };
 
 // const BASE_URL = 'http://localhost:8000' // Cambia esto por tu dominio real en producción
-const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
+// const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
+const BASE_URL = 'https://api.inmobiliaria-habitable.com'
 const getArchivoUrl = (ruta) => {
    if (!ruta) return '#'
    if (ruta.startsWith('http')) return ruta
