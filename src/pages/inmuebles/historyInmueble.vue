@@ -310,14 +310,14 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
                   </VCol>
 
                   <VCol cols="12" v-if="modalData?.extra">
-                     <h5 class="text-h6 font-weight-bold mb-2">Detalles Adicionales</h5>
+                     <h5 class="text-h6 font-weight-bold mb-2">Detalles</h5>
                      <ul>
                         <li v-for="(value, key) in modalData.extra" :key="key">
                            <strong>{{ key }}:</strong>
                            <template
                               v-if="typeof value === 'string' && (value.endsWith('.jpg') || value.endsWith('.png') || value.endsWith('.jpeg') || value.endsWith('.pdf') || value.startsWith('/storage/'))">
                               <a
-                                :href="value.replace(/localhost:8000/, BASE_URL.replace(/\/$/, ''))"
+                                :href="value.replace(/https?:\/\/localhost:8000/, BASE_URL.replace(/\/$/, ''))"
                                 target="_blank"
                                 rel="noopener"
                                 style="color: #1976d2; text-decoration: underline;"
