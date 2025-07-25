@@ -171,34 +171,71 @@ const BASE_URL = import.meta.env.VITE_API_LARAVEL_BASE_URL
           No hay reportes de inmuebles disponibles.
         </VAlert>
       </VCol>
-      <VCol v-for="reporte in reportes" :key="reporte.inmueble_id + '-' + reporte.user_id" cols="12" md="6" lg="4">
+      <VCol v-for="reporte in reportes" :key="reporte.inmueble_id" cols="12" md="6" lg="4">
         <VCard elevation="2" class="pa-4 mb-6">
           <VCardTitle class="font-weight-bold text-h6 mb-2">
-            Inmueble #{{ reporte.inmueble_id }} - {{ reporte.inmueble_direccion || 'Sin dirección' }}
+            Inmueble #{{ reporte.inmueble_id }} - {{ reporte.direccion || 'Sin dirección' }}
           </VCardTitle>
           <VCardText>
             <div class="mb-2">
-              <strong>Arrendatario:</strong> {{ reporte.usuario_nombre || '-' }}
+              <strong>Arrendatario:</strong> {{ reporte.arrendatario_id || '-' }}
             </div>
-            <div>
-              <span>Total novedades: </span>
-              <strong>{{ reporte.total }}</strong>
+            <div class="mb-2">
+              <VAlert v-if="reporte.en_mora" type="error" class="mb-2">
+                ¡Atención! Tienes novedades pendientes en mora para este inmueble.
+              </VAlert>
+              <VAlert v-else-if="reporte.novedades_pendientes.length === 0" type="success" class="mb-2">
+                No tienes novedades pendientes por pagar en este inmueble.
+              </VAlert>
+              <VAlert v-else-if="!reporte.arrendatario_id && reporte.novedades_pendientes.length > 0" type="info" class="mb-2">
+                Tienes deudas históricas pendientes de este inmueble.
+              </VAlert>
             </div>
-            <div class="mt-2">
-              <strong>Listado de novedades:</strong>
-              <VList density="compact" class="mt-1">
-                <VListItem v-for="novedad in reporte.novedades" :key="novedad.id">
-                  <VListItemTitle>
-                    <span class="font-weight-bold">{{ novedad.nombre }}</span> - {{ novedad.item_nombre }}
-                  </VListItemTitle>
-                  <VListItemSubtitle>
-                    <span class="text-grey">{{ novedad.descripcion }}</span><br>
-                    <span>Fecha: {{ novedad.fecha }}</span> |
-                    <span>Estado: <VChip :color="novedad.estado && novedad.estado.toLowerCase() === 'pendiente' ? 'warning' : 'success'" size="x-small">{{ novedad.estado }}</VChip></span> |
-                    <span>Valor: {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(Number(novedad.valor)) }}</span>
-                  </VListItemSubtitle>
-                </VListItem>
-              </VList>
+            <div class="mb-2">
+              <div class="d-flex align-center">
+                <div>
+                  <div><strong>Total arriendo:</strong></div>
+                  <div class="text-h5">{{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(reporte.total_arriendo) }}</div>
+                </div>
+                <div class="mx-4">
+                  <div><strong>Total pagado:</strong></div>
+                  <div class="text-h5">{{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(reporte.total_pagado) }}</div>
+                </div>
+              </div>
+              <VProgressLinear
+                :model-value="reporte.total_arriendo > 0 ? Math.min(100, Math.round((reporte.total_pagado / reporte.total_arriendo) * 100)) : 0"
+                color="success"
+                height="10"
+                class="my-2"
+                v-if="reporte.total_arriendo > 0"
+              />
+            </div>
+            <div v-if="reporte.novedades_pendientes.length > 0">
+              <h5 class="font-weight-bold mb-2">Novedades pendientes</h5>
+              <VTable>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                    <th>Valor</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="n in reporte.novedades_pendientes" :key="n.id">
+                    <td>{{ n.nombre }}</td>
+                    <td>{{ n.descripcion }}</td>
+                    <td>{{ n.fecha }}</td>
+                    <td>{{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(n.valor) }}</td>
+                    <td>
+                      <VChip :color="n.estado && n.estado.toLowerCase() === 'pendiente' ? 'warning' : 'success'" size="x-small">
+                        {{ n.estado }}
+                      </VChip>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
             </div>
           </VCardText>
         </VCard>

@@ -10,12 +10,14 @@ const props = defineProps({
   roles: Array,  // Asegúrate de que sea un Array, ya que los roles son una lista
 });
 
+
 const warning = ref(null);
 const error_exists = ref(null)
 const success_exists = ref(null)
 const isPasswordVisible = ref(false)
 const FILE_AVATAR = ref(null)
 const IMAGEN_PREVIZUALIZA = ref(null)
+const isSaving = ref(false)
 
 
 const userData = ref({
@@ -134,26 +136,28 @@ const save = async () => {
   formData.append("celular", userData.value.celular)
   formData.append("email", userData.value.email)
   formData.append("password", userData.value.password)
-  formData.append("status", userData.value.status)
+  formData.append("status", userData.value.status ? userData.value.status.charAt(0) : '')
   formData.append("genero", userData.value.genero)
   if (FILE_AVATAR) {
     formData.append("avatar", userData.value.avatar)
   }
 
+  isSaving.value = true;
   try {
-
     const resp = await $api('/user', {
       method: 'POST',
       body: formData,
       onResponseError(response) {
+        isSaving.value = false;
         if (response.response.status == 403 || response.response.status == 500) {
           error_exists.value = response.response._data.message;
         }
       }
     })
 
+    isSaving.value = false;
     if (resp.status == 200) {
-      success_exists.value = resp.message_text;
+      success_exists.value = 'Guardado con éxito';
       // 🔄 Emitir evento para recargar la lista de roles en el componente padre
       emit('close', true);
       onFormReset();
@@ -163,13 +167,9 @@ const save = async () => {
       success_exists.value = null
       warning.value = null
       error_exists.value = null
-
-      // emit('update:isDialogVisible', false)
     }, 2500);
-
-
   } catch (error) {
-
+    isSaving.value = false;
   }
 }
 
@@ -278,6 +278,8 @@ watch(() => userData.value.numero_documento, (newValue) => {
             </VRow>
           </VCol>
           <VAlert type="warning" v-if="warning" class="mt-3"> <strong>{{ warning }}</strong> </VAlert>
+          <VAlert type="info" v-if="isSaving" class="mt-3">Guardando...</VAlert>
+          <VAlert type="success" v-if="success_exists" class="mt-3">{{ success_exists }}</VAlert>
 
           <!-- <VCol cols="12" md="6">
             <VSelect v-model="userData.country" :items="['United States', 'United Kingdom', 'France']"
